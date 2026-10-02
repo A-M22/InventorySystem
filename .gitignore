@@ -1,0 +1,18 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Rider / IntelliJ
+.idea/
+
+# .NET build output
+bin/
+obj/
+
+# User-specific files
+*.userprefs
+
+# Generated files
+*.g.cs
+*.g.i.cs
