@@ -13,6 +13,7 @@ namespace InventorySystem.PL.ViewModels
         public ObservableCollection<ItemCode> ItemCodes { get; } = new();
 
         private string _newCode = string.Empty;
+        private int _id = -1;
 
         public string NewCode
         {
@@ -22,16 +23,27 @@ namespace InventorySystem.PL.ViewModels
                 _newCode = value;
                 OnPropertyChanged();
             }
-              
+
+        }
+
+        public int ID
+        {
+            get => _id;
+            set
+            {
+                _id = value;
+                OnPropertyChanged();
+            }
         }
 
         public RelayCommand AddCommand { get; }
-           
+        public RelayCommand EditCommand { get; }
 
         public ItemCodeViewModel(ItemCodeBLL itemCodeBLL)
         {
             _itemCodeBLL = itemCodeBLL;
             AddCommand = new RelayCommand(AddItemCode);
+            EditCommand = new RelayCommand(EditItemCode);
             LoadItemCodes();
         }
 
@@ -41,7 +53,7 @@ namespace InventorySystem.PL.ViewModels
 
             ItemCodes.Clear();
 
-            foreach(ItemCode code in codes)
+            foreach (ItemCode code in codes)
             {
                 ItemCodes.Add(code);
             }
@@ -52,18 +64,35 @@ namespace InventorySystem.PL.ViewModels
             bool success =
                 _itemCodeBLL.AddItemCode(NewCode);
 
-            if(!success)
+            if (!success)
             {
                 MessageBox.Show(
                     "Could Not Add Item Code!.");
                 return;
             }
             NewCode = string.Empty;
-            LoadItemCodes();    
+            LoadItemCodes();
 
         }
 
+        private void EditItemCode()
+        {
+            bool success =
+                _itemCodeBLL.EditItemCode(NewCode, ID);
+
+            if (!success)
+            {
+                {
+                    MessageBox.Show
+                        ("Could Not Eidt Item Code!.");
+                    return;
+                }
+                NewCode = string.Empty;
+                LoadItemCodes();
+            }
 
 
+
+        }
     }
 }

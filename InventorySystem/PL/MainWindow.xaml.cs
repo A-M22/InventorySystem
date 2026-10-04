@@ -20,27 +20,12 @@ namespace InventorySystem
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow( MainViewModel viewModel)
         {
             InitializeComponent();
+            DataContext = viewModel;
 
-            try
-            {
-                Database database = new Database();
 
-                ItemCodeDAL itemcodeDAL = new ItemCodeDAL(database);
-                ItemCodeBLL itemcodeBLL = new ItemCodeBLL(itemcodeDAL);
-                ItemCodeViewModel itemCodeViewModel = new ItemCodeViewModel(itemcodeBLL);
-
-                DataContext = new MainViewModel(itemCodeViewModel);
-
-                
-                
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
         }
 
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)

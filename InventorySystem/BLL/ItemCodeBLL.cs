@@ -37,6 +37,20 @@ namespace InventorySystem.BLL
             return isSuccessful;
         }
 
+        public bool EditItemCode(string Code,int ID)
+        {
+            bool isSuccessful = false;
+            if (string.IsNullOrWhiteSpace(Code) )
+            {
+                return false;
+            }
+
+            Code=Code.Trim();
+            //isSuccessful = _itemCodeDAL.EditItemCode(Code,ID);
+
+            return false;
+        }
+
         public bool deleteItemCodeByCode(string Code)
         {
             bool isSuccessful=false;
