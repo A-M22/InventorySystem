@@ -52,43 +52,33 @@ namespace InventorySystem.DAL
         {
             using var command = connection.CreateCommand();
             command.CommandText = """
-                                
-                PRAGMA foreign_keys = ON;
-
-                create table IF NOT EXISTS ItemCode
+                                create table if not exists ItemCode
                 (
                     ID integer primary key,
                     Code varchar(50) unique not null
                 );
 
-                create table IF NOT EXISTS ItemType
-                (
-                    ID integer primary key,
-                    itemTypeName varchar(25)
-                );
 
-                create table IF NOT EXISTS Catalog 
+
+                create table if not exists Catalog 
                 (
                     ID integer primary key,
-                    ItemCodeID integer not null,
                     PartNumber varchar(50) unique null,
                     Name varchar(255) not null,
-                    ItemTypeID integer,
+                    ItemCodeID integer,
                     Note varchar(255) null,
-                    foreign key (ItemCodeID) references ItemCode(ID),
-                    foreign key (ItemTypeId) references ItemType(ID)
+                    foreign key (ItemCodeID) references ItemCode(ID)
                 );
 
-                                
-                create table IF NOT EXISTS Location
+                                create table if not exists Location
                 (
                     ID integer primary key,
                     Name varchar(50) unique not null,
                     Note varchar(50) null, 
-                    status boolean default true 
+                    status boolean default true -- if not active then it won't be used again so the history doesn go kapoom and if it has a part stored in it or other storages then it can't be deleted till the user edit them all or the parts will be nulled
                 );
 
-                create table IF NOT EXISTS Storage
+                create table if not exists Storage
                 (
                     ID integer primary key,
                     LocationID integer not null,
@@ -98,7 +88,7 @@ namespace InventorySystem.DAL
                     foreign key (LocationID) references Location(ID)
                 );
 
-                create table IF NOT EXISTS Rack
+                create table if not exists Rack
                 (
                     ID integer primary key,
                     StorageID integer not null,
@@ -108,7 +98,7 @@ namespace InventorySystem.DAL
                     foreign key (StorageID) references Storage(ID)
                 );
 
-                create table IF NOT EXISTS Shelf
+                                create table if not exists Shelf
                 (
                     ID integer primary key,
                     RackID integer not null,
@@ -118,13 +108,19 @@ namespace InventorySystem.DAL
                     foreign key (RackID) references Rack(ID)
                 );
 
+                create table if not exists PartType
+                (
+                    ID integer primary key,
+                    Name varchar(50) unique not null,
+                    Note varchar(255) null
+                );
 
-
-                create table IF NOT EXISTS Part
+                create table if not exists Part
                 (
                     ID integer primary key,
                     CatalogID integer not null,
-                    SerialNumber varchar(50) unique null,
+                    SofwareSerialNumber varchar(50) unique null,
+                    HardwareSerialNumber varchar(50) unique null,
                     OptionalName varchar(50) null,
                     Note varchar(255) null,
                     Status varchar(50) null,
@@ -134,33 +130,30 @@ namespace InventorySystem.DAL
                     CurrentShelfID integer null,
                     ParentPartID integer null,
                     LastInventory DateTime default current_timestamp,
+                    ReleaseCode varchar(10) null default null,
+                    PartTypeID integer not null,
+
                     foreign key (CurrentLocationID) references Location(ID),
                     foreign key (CurrentStorageID) references Storage(ID),
                     foreign key (CurrentRackID) references Rack(ID),
                     foreign key (CurrentShelfID) references Shelf(ID),
                     foreign key (ParentPartID) references Part(ID),
-                    foreign key (CatalogID) references Catalog(ID)
+                    foreign key (CatalogID) references Catalog(ID),
+                    foreign key (PartTypeID) references PartType(ID)
                 );
 
-
-
-
-
-                create table IF NOT EXISTS Action
+                create table if not exists Action
                 (
                     ID integer primary key,
                     Name varchar(50) unique not null,
                     Note varchar(255) null
                 );
 
-
-
-
-                create table IF NOT EXISTS History
+                                create table if not exists History
                 (
                     ID integer primary key,
                     PartID integer not null,
-                    FromLocationID integer null,
+                    FromLocationID integer null, --if a new part it also to have a from location since it comes from somewhere the compary or the main source
                     ToLocationID integer null,
                     FromStorageID integer null,
                     ToStorageID integer null,
@@ -168,7 +161,7 @@ namespace InventorySystem.DAL
                     ToRackID integer null,
                     FromShelfID integer null,
                     ToShelfID integer null,
-                    ActionID integer not null,
+                    ActionID integer not null, -- action type should be named so the user knows what he did at this date
                     FromStatus varchar(50) null,
                     ToStatus varchar(50) null,
                     Note varchar(255) null,
@@ -185,7 +178,7 @@ namespace InventorySystem.DAL
                     foreign key (ActionID) references Action(ID)
 
                 );
-                
+
                 """;
             command.ExecuteNonQuery();
         }
